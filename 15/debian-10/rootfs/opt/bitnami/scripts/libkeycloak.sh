@@ -379,12 +379,12 @@ keycloak_initialize() {
     keycloak_clean_from_restart
 
     # Wait for database
-    info "Trying to connect to PostgreSQL server $KEYCLOAK_DATABASE_HOST..."
+    info "Trying to connect to database server $KEYCLOAK_DATABASE_HOST..."
     if ! retry_while "wait-for-port --host $KEYCLOAK_DATABASE_HOST --timeout 10 $KEYCLOAK_DATABASE_PORT" "$KEYCLOAK_INIT_MAX_RETRIES"; then
         error "Unable to connect to host $KEYCLOAK_DATABASE_HOST"
         exit 1
     else
-        info "Found PostgreSQL server listening at $KEYCLOAK_DATABASE_HOST:$KEYCLOAK_DATABASE_PORT"
+        info "Found database server listening at $KEYCLOAK_DATABASE_HOST:$KEYCLOAK_DATABASE_PORT"
     fi
 
     if ! is_dir_empty "$KEYCLOAK_MOUNTED_CONF_DIR"; then
