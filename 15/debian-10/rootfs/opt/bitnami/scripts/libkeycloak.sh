@@ -94,19 +94,34 @@ keycloak_configure_database() {
     local jdbc_params
     jdbc_params="$(echo "$KEYCLOAK_JDBC_PARAMS" | sed -E '/^$|^\?+.*$/!s/^/?/')"
 
+    case "$KEYCLOAK_DATABASE_VENDOR" in
+        MYSQL) CONNECTION_URL="jdbc:mysql://${KEYCLOAK_DATABASE_HOST}:${KEYCLOAK_DATABASE_PORT}/${KEYCLOAK_DATABASE_NAME}${jdbc_params}"
+               DRIVER_NAME="mysql"
+               DRIVER_MODULE="com.mysql"
+               DRIVER_XA_DATASOURCE_CLASS="com.mysql.cj.jdbc.MysqlXADataSource"
+               SCHEMA_COMMAND="" ;;
+     POSTGRES) CONNECTION_URL="jdbc:postgresql://${KEYCLOAK_DATABASE_HOST}:${KEYCLOAK_DATABASE_PORT}/${KEYCLOAK_DATABASE_NAME}${jdbc_params}"
+               DRIVER_NAME="postgresql"
+               DRIVER_MODULE="org.postgresql.jdbc"
+               DRIVER_XA_DATASOURCE_CLASS="org.postgresql.xa.PGXADataSource"
+               SCHEMA_COMMAND="/subsystem=keycloak-server/spi=connectionsJpa/provider=default:write-attribute(name=properties.schema,value=${KEYCLOAK_DATABASE_SCHEMA})" ;;
+            *) error "Unsupported database vendor $KEYCLOAK_DATABASE_VENDOR"
+               exit 1 ;;
+    esac
+
     info "Configuring database settings"
     debug_execute jboss-cli.sh <<EOF
 embed-server --server-config=${KEYCLOAK_CONF_FILE} --std-out=echo
 batch
 /subsystem=datasources/data-source=KeycloakDS: remove()
-/subsystem=datasources/data-source=KeycloakDS: add(jndi-name=java:jboss/datasources/KeycloakDS,enabled=true,use-java-context=true,use-ccm=true, connection-url=jdbc:postgresql://${KEYCLOAK_DATABASE_HOST}:${KEYCLOAK_DATABASE_PORT}/${KEYCLOAK_DATABASE_NAME}${jdbc_params}, driver-name=postgresql)
+/subsystem=datasources/data-source=KeycloakDS: add(jndi-name=java:jboss/datasources/KeycloakDS,enabled=true,use-java-context=true,use-ccm=true, connection-url=${CONNECTION_URL}, driver-name=${DRIVER_NAME})
 /subsystem=datasources/data-source=KeycloakDS: write-attribute(name=user-name, value=\${env.KEYCLOAK_DATABASE_USER})
 /subsystem=datasources/data-source=KeycloakDS: write-attribute(name=check-valid-connection-sql, value="SELECT 1")
 /subsystem=datasources/data-source=KeycloakDS: write-attribute(name=background-validation, value=true)
 /subsystem=datasources/data-source=KeycloakDS: write-attribute(name=background-validation-millis, value=60000)
 /subsystem=datasources/data-source=KeycloakDS: write-attribute(name=flush-strategy, value=IdleConnections)
-/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql, driver-module-name=org.postgresql.jdbc, driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)
-/subsystem=keycloak-server/spi=connectionsJpa/provider=default:write-attribute(name=properties.schema,value=${KEYCLOAK_DATABASE_SCHEMA})
+/subsystem=datasources/jdbc-driver=${DRIVER_NAME}:add(driver-name=${DRIVER_NAME}, driver-module-name=${DRIVER_MODULE}, driver-xa-datasource-class-name=${DRIVER_XA_DATASOURCE_CLASS})
+${SCHEMA_COMMAND}
 run-batch
 stop-embedded-server
 EOF
