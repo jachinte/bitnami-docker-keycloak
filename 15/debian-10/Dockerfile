@@ -17,6 +17,14 @@ RUN . /opt/bitnami/scripts/libcomponent.sh && component_unpack "mysql-client" "1
 RUN chmod g+rwX /opt/bitnami
 
 COPY rootfs /
+
+# Create the mysql module (com.mysql)
+RUN mkdir -p /opt/bitnami/keycloak/modules/system/layers/base/com/mysql/main
+RUN curl -L -o mysql-connector.jar https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.26/mysql-connector-java-8.0.26.jar
+RUN echo 'e5ec6610020a3084b7d32ee725d1650176f6b3de  mysql-connector.jar' | sha1sum -c -
+RUN mv mysql-connector.jar /opt/bitnami/keycloak/modules/system/layers/base/com/mysql/main
+RUN mv /opt/bitnami/scripts/mysql-module.xml /opt/bitnami/keycloak/modules/system/layers/base/com/mysql/main/module.xml
+
 RUN /opt/bitnami/scripts/keycloak/postunpack.sh
 ENV BITNAMI_APP_NAME="keycloak" \
     BITNAMI_IMAGE_VERSION="15.0.2-debian-10-r42" \
