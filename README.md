@@ -84,6 +84,7 @@ The Bitnami Keycloak container can create a default admin user by setting the fo
 
 The Bitnami Keycloak container supports PostgreSQL, MySQL and MariaDB. This is configured with the following environment variables:
 
+- `KEYCLOAK_DATABASE_VENDOR`: Database vendor (POSTGRES or MYSQL). Default: **POSTGRES**.
 - `KEYCLOAK_DATABASE_HOST`: Database host. Default: **postgresql**.
 - `KEYCLOAK_DATABASE_PORT`: Database port. Default: **5432**.
 - `KEYCLOAK_DATABASE_NAME`: Database name. Default: **bitnami_keycloak**.
