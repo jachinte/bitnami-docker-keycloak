@@ -80,17 +80,17 @@ The Bitnami Keycloak container can create a default admin user by setting the fo
 - `KEYCLOAK_MANAGEMENT_USER`: WildFly default management user. Default: **manager**.
 - `KEYCLOAK_MANAGEMENT_PASSWORD`: WildFly default management password. Default: **bitnami1**.
 
-## Connecting to a PostgreSQL database
+## Connecting to a database
 
-The Bitnami Keycloak container requires a PostgreSQL database to work. This is configured with the following environment variables:
+The Bitnami Keycloak container supports PostgreSQL, MySQL and MariaDB. This is configured with the following environment variables:
 
-- `KEYCLOAK_DATABASE_HOST`: PostgreSQL host. Default: **postgresql**.
-- `KEYCLOAK_DATABASE_PORT`: PostgreSQL port. Default: **5432**.
-- `KEYCLOAK_DATABASE_NAME`: PostgreSQL database name. Default: **bitnami_keycloak**.
-- `KEYCLOAK_DATABASE_USER`: PostgreSQL database user. Default: **bn_keycloak**.
-- `KEYCLOAK_DATABASE_PASSWORD`: PostgreSQL database password. No defaults.
+- `KEYCLOAK_DATABASE_HOST`: Database host. Default: **postgresql**.
+- `KEYCLOAK_DATABASE_PORT`: Database port. Default: **5432**.
+- `KEYCLOAK_DATABASE_NAME`: Database name. Default: **bitnami_keycloak**.
+- `KEYCLOAK_DATABASE_USER`: Database user. Default: **bn_keycloak**.
+- `KEYCLOAK_DATABASE_PASSWORD`: Database password. No defaults.
 - `KEYCLOAK_DATABASE_SCHEMA`: PostgreSQL database schema. Default: **public**.
-- `KEYCLOAK_JDBC_PARAMS`: PostgreSQL database JDBC parameters (example: `sslmode=verify-full&connectTimeout=30000`). No defaults.
+- `KEYCLOAK_JDBC_PARAMS`: Database JDBC parameters (example: `sslmode=verify-full&connectTimeout=30000`). No defaults.
 
 ## Port and address binding
 
